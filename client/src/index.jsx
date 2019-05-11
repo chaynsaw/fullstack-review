@@ -12,6 +12,16 @@ class App extends React.Component {
     }
 
   }
+  componentDidMount() {
+    console.log('mounted');
+    $.ajax({
+      method: 'GET',
+      url: 'http://localhost:1128/repos',
+      success: function(data) {
+        console.log(data);
+      }
+    })
+  }
 
   search (term) {
     console.log(`${term} was searched`);
