@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-var db = mongoose.connect('mongodb://localhost/fetcher');
+var db = mongoose.connect('mongodb://localhost/fetcher', {useMongoClient: true});
 
 let repoSchema = mongoose.Schema({
   id:  { type: Number, unique: true },
@@ -13,6 +13,7 @@ let repoSchema = mongoose.Schema({
 let Repo = mongoose.model('Repo', repoSchema);
 
 let save = (repoData, callback) => {
+  var arrRepos = [];
   repoData.forEach((repo) => {
     // console.log(repo.owner.login);
     var newRepo = new Repo();
@@ -21,18 +22,35 @@ let save = (repoData, callback) => {
     newRepo.url = repo.html_url;
     newRepo.name = repo.name;
     newRepo.forks = repo.forks;
-    newRepo.save((err) => {
-      callback(err, repoData);
-    })
+    arrRepos.push(newRepo)
+  })
+  Repo.insertMany(arrRepos, (err, results) => {
+    callback(err, results);
   })
 }
 
-// let find = (top25, callback) => {
-
+let getTop25 = (callback) => {
+  Repo.find((err, results) => {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null, results)
+    }
+  }).lean().sort({ name: -1 })
+}
+// let getCount = (callback) => {
+//   Repo.count((err, results) => {
+//     if (err) {
+//       callback(err);
+//     } else {
+//       callback(null, results)
+//     }
+//   })
 // }
-
   // TODO: Your code here
   // This function should save a repo or repos to
   // the MongoDB  
 
 module.exports.save = save;
+module.exports.getTop25 = getTop25;
+// module.exports.getCount = getCount;

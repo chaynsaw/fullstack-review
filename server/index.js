@@ -33,10 +33,29 @@ app.post('/repos', function (req, res) {
 });
 
 app.get('/repos', function (req, res) {
-  res.json('get success');
+
+  db.getTop25((err, results) => {
+    if(err) {
+      console.log('WTF')
+      throw err;
+    } else {
+      console.log('SUCCEED')
+      res.json(results);
+    }
+  })
   // TODO - your code here!
   // This route should send back the top 25 repos
 });
+
+// app.get('/repos/count', function(req, res) {
+//   db.getCount((err, results) => {
+//     if (err) {
+//       throw err;
+//     } else {
+//       res.json(results);
+//     }
+//   })
+// })
 
 let port = 1128;
 
